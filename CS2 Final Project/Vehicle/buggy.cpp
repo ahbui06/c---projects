@@ -5,5 +5,6 @@ Buggy::Buggy()
 
 void Buggy::useSpecialAbility() {
     // Reduces rough terrain effects by 50% for this run
-    
+    setDurability(getDurability() + 5);
+    setFuel(getFuel() + 8);
 }
