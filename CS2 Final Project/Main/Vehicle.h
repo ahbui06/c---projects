@@ -3,6 +3,8 @@
 
 using namespace std;
 
+class Player;
+
 class Vehicle {
     public:
         Vehicle(const string &name, int durability, int fuel, int speed, int cargoCapacity);
@@ -26,7 +28,7 @@ class Vehicle {
         void applyDamage(int amount);
         void consumeFuel(int amount);
 
-        virtual void useSpecialAbility();
+        virtual void useSpecialAbility(Player &player);
 
         bool isDestroyed() const;
         bool isOutOfFuel() const;

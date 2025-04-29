@@ -2,8 +2,10 @@
 
 #include "Vehicle.h"
 
+class Player;
+
 class Sedan : public Vehicle {
 public:
     Sedan();
-    void useSpecialAbility() override;
+    void useSpecialAbility(Player &player) override;
 };

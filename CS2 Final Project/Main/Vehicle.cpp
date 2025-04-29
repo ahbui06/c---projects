@@ -68,7 +68,7 @@ void Vehicle::consumeFuel(int amount) {
     }
 }
 
-void Vehicle::useSpecialAbility() {}
+void Vehicle::useSpecialAbility(Player &player) {}
 
 bool Vehicle::isDestroyed() const {
     return durability <= 0;
