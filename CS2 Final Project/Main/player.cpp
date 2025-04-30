@@ -3,6 +3,7 @@
 // =============================
 #include "Player.h"
 #include <iostream>
+#include <limits>
 
 using namespace std;
 
@@ -40,7 +41,7 @@ void Player::printOwnedVehicles() const {
 }
 
 void Player::printInventoryItems() const {
-    std::cout << "Inventory Items:\n";
+    cout << "Inventory Items:\n";
     if (inventoryCount == 0) {
         cout << "  None\n";
     } else {
@@ -95,13 +96,35 @@ bool Player::hasInventorySpace() const {
 }
 
 Vehicle* Player::chooseVehicle() const {
-    // TODO: real selection logic
-    // return (ownedVehicleCount>0 ? ownedVehicles[0] : nullptr);
+    printOwnedVehicles();
+    if (ownedVehicleCount == 0) 
+        return nullptr;
+
+    int choice = 0;
+    cout << "Choose vehicle to equip (1-" << ownedVehicleCount << "): ";
+    while (!(cin >> choice) || choice < 1 || choice > ownedVehicleCount) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n'); //basically clears anything that isnt 1-4 in the buffer
+        cout << "Invalid. Enter a number between 1 and " 
+             << ownedVehicleCount << ": ";
+    }
+    return ownedVehicles[choice - 1];
 }
 
 Item* Player::chooseItem() const {
-    // TODO: real selection logic
-    // return (inventoryCount>0 ? inventory[0] : nullptr);
+    printInventoryItems();
+    if (inventoryCount == 0) 
+        return nullptr;
+
+    int choice = 0;
+    cout << "Choose item to use (1-" << inventoryCount << "): ";
+    while (!(cin >> choice) || choice < 1 || choice > inventoryCount) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n'); //basically clears anything that isnt 1-4 in the buffer
+        cout << "Invalid. Enter a number between 1 and " 
+             << inventoryCount << ": ";
+    }
+    return inventory[choice - 1];
 }
 
 void Player::useItem(Item* item, Vehicle& v) {

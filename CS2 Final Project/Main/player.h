@@ -7,7 +7,7 @@
 #include "Item.h"
 
 static const int MAX_VEHICLES   = 4;
-static const int MAX_INVENTORY  = 20;
+static const int MAX_INVENTORY  = 7;
 
 class Player {
 public:

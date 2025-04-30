@@ -9,7 +9,7 @@ public:
     virtual ~Item();
 
     const std::string& getName() const;
-    virtual void use(Vehicle &v) = 0;
+    virtual void use(Vehicle &v) {};
 
 private:
     std::string name;

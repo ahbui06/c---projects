@@ -9,8 +9,6 @@
 #include "Player.h"
 #include <iostream>
 
-using namespace std;
-
 Shop::Shop() {
     vehicleCatalog[0] = new Buggy();
     vehicleCatalog[1] = new Truck();
@@ -30,45 +28,82 @@ Shop::~Shop() {
 }
 
 void Shop::displayVehicles() const {
-    cout << "--- Vehicles for Sale ---";
+    std::cout << "--- Vehicles for Sale ---\n";
     for (int i = 0; i < SHOP_VEHICLE_COUNT; ++i) {
         const auto *v = vehicleCatalog[i];
+        int price = 0;
+        switch (i+1) {
+            case 1: price = 100;  break;  // Buggy
+            case 2: price = 1250; break;  // Truck
+            case 3: price = 500;  break;  // Sedan
+            case 4: price = 1000; break;  // SportsCar
+        }
         std::cout << (i+1) << ") " << v->getName()
-                  << " -- Price: " << 50 << "";
+                  << " -- Price: " << price << "\n";
     }
 }
 
 void Shop::displayItems() const {
-    cout << "--- Items for Sale ---";
+    std::cout << "--- Items for Sale ---\n";
     for (int i = 0; i < SHOP_ITEM_COUNT; ++i) {
         const auto *it = itemCatalog[i];
-        cout << (i+1) << ") " << it->getName()
-                  << " -- Price: " << 25 << "";
+        int price = 0;
+        switch (i+1) {
+            case 1: price = 250; break; // RepairKit
+            case 2: price = 200; break; // FuelCanister
+            case 3: price = 300; break; // ArmorPatch
+        }
+        std::cout << (i+1) << ") " << it->getName()
+                  << " -- Price: " << price << "\n";
     }
 }
 
 bool Shop::purchaseVehicle(int index, Player &player) {
     if (index < 1 || index > SHOP_VEHICLE_COUNT) return false;
-    Vehicle *prototype = vehicleCatalog[index-1];
-    int price = 50; // TODO: use getPrice()
+    int price = 0;
+    switch (index) {
+        case 1: price = 100;  break;  // Buggy
+        case 2: price = 1250; break;  // Truck
+        case 3: price = 500;  break;  // Sedan
+        case 4: price = 1000; break;  // SportsCar
+    }
     if (player.getCurrency() >= price) {
         player.addCurrency(-price);
-        // Clone the prototype (shallow copy)
-        player.addOwnedVehicle(new Vehicle(*prototype));
-        return true;
+        Vehicle *v = nullptr;
+        switch (index) {
+            case 1: v = new Buggy();    break;
+            case 2: v = new Truck();    break;
+            case 3: v = new Sedan();    break;
+            case 4: v = new SportsCar(); break;
+        }
+        if (v) {
+            player.addOwnedVehicle(v);
+            return true;
+        }
     }
     return false;
 }
 
 bool Shop::purchaseItem(int index, Player &player) {
     if (index < 1 || index > SHOP_ITEM_COUNT) return false;
-    Item *prototype = itemCatalog[index-1];
-    int price = 25; // TODO: use getPrice()
+    int price = 0;
+    switch (index) {
+        case 1: price = 250; break; // RepairKit
+        case 2: price = 200; break; // FuelCanister
+        case 3: price = 300; break; // ArmorPatch
+    }
     if (player.getCurrency() >= price && player.hasInventorySpace()) {
         player.addCurrency(-price);
-        // Clone the prototype (shallow copy)
-        player.addItem(new Item(*prototype));
-        return true;
+        Item *it = nullptr;
+        switch (index) {
+            case 1: it = new RepairKit();    break;
+            case 2: it = new FuelCanister(); break;
+            case 3: it = new ArmorPatch();   break;
+        }
+        if (it) {
+            player.addItem(it);
+            return true;
+        }
     }
     return false;
 }
