@@ -3,7 +3,7 @@
 Buggy::Buggy()
     : Vehicle("Buggy", 75, 75, 7, 3) {}
 
-void Buggy::useSpecialAbility() {
+void Buggy::useSpecialAbility(EventType ev, Player &player, int &value) {
     // Reduces rough terrain effects by 50% for this run
     setDurability(getDurability() + 5);
     setFuel(getFuel() + 8);

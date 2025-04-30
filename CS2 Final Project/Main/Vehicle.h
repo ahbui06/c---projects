@@ -5,6 +5,17 @@ using namespace std;
 
 class Player;
 
+enum class EventType {
+    AbandonedFuelCache,
+    SmoothRoad,
+    DownhillStretch,
+    FriendlyTravelers,
+    BanditAmbush,
+    Obstacle,
+    Sandstorm,
+    Roadblock
+};
+
 class Vehicle {
     public:
         Vehicle(const string &name, int durability, int fuel, int speed, int cargoCapacity);
@@ -28,7 +39,7 @@ class Vehicle {
         void applyDamage(int amount);
         void consumeFuel(int amount);
 
-        virtual void useSpecialAbility(Player &player);
+        virtual void useSpecialAbility(EventType ev, Player &player, int &value);
 
         bool isDestroyed() const;
         bool isOutOfFuel() const;

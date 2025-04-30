@@ -68,7 +68,7 @@ void Vehicle::consumeFuel(int amount) {
     }
 }
 
-void Vehicle::useSpecialAbility(Player &player) {}
+void Vehicle::useSpecialAbility(EventType ev, Player &player, int &value) {}
 
 bool Vehicle::isDestroyed() const {
     return durability <= 0;

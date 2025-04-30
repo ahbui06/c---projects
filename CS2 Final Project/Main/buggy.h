@@ -5,5 +5,5 @@
 class Buggy : public Vehicle {
 public:
     Buggy();
-    void useSpecialAbility() override;
+    void useSpecialAbility(EventType ev, Player &player, int &value) override;
 };
