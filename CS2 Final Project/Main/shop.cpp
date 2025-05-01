@@ -37,9 +37,9 @@ void Shop::displayVehicles() const {
 
 void Shop::displayItems() const {
     cout << "\n--- Items for Sale ---\n";
-    cout << "1) RepairKit    -- Price: 250\n"
-         << "2) FuelCanister -- Price: 200\n"
-         << "3) ArmorPatch   -- Price: 300\n";
+    cout << "1) RepairKit    -- Price: 100\n"
+         << "2) FuelCanister -- Price: 50\n"
+         << "3) ArmorPatch   -- Price: 150\n";
 }
 
 bool Shop::purchaseVehicle(int index, Player &player) {
@@ -91,9 +91,9 @@ bool Shop::purchaseItem(int index, Player &player) {
     int price = 0;
     Item *it   = nullptr;
     switch (index) {
-      case 1: price = 250; it = new RepairKit();    break;
-      case 2: price = 200; it = new FuelCanister(); break;
-      case 3: price = 300; it = new ArmorPatch();   break;
+      case 1: price = 100; it = new RepairKit();    break;
+      case 2: price = 50; it = new FuelCanister(); break;
+      case 3: price = 150; it = new ArmorPatch();   break;
     }
     if (player.getCurrency() < price) {
         cout << "Not enough currency to buy that item.\n";
@@ -102,7 +102,12 @@ bool Shop::purchaseItem(int index, Player &player) {
     }
 
     player.addCurrency(-price);
-    player.addItem(it);
+    if (player.addItem(it, *current)) {
+        current->incrementCargo();
+    } else {
+        delete it;  // drop it if no space
+        cout << "No cargo space!\n";
+    }
     // tell the vehicle you’re now carrying one more
     current->incrementCargo();
 

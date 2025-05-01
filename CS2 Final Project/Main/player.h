@@ -1,6 +1,4 @@
-// =============================
-// File: Player.h
-// =============================
+
 #pragma once
 
 #include "Vehicle.h"
@@ -14,11 +12,14 @@ public:
     Player();
     ~Player();
 
-    int  getCurrency() const;
+    int getCurrency() const;
     void addCurrency(int amount);
 
-    int  getRunCount() const;
+    int getRunCount() const;
     void incrementRunCount();
+
+    void setCurrency(int c);
+    void setRunCount(int r);
 
     void printOwnedVehicles() const;
     void printInventoryItems() const;
@@ -27,27 +28,35 @@ public:
 
     bool addOwnedVehicle(Vehicle* v);
     bool removeOwnedVehicle(Vehicle* v);
+    int getOwnedVehicleCount() const;
 
-    bool addItem(Item* i);
+    Vehicle* getOwnedVehicle(int index) const;
+    Item* getInventoryItem(int index) const;
+
+
+    bool addItem(Item* i, Vehicle &v);
     bool removeItem(Item* i);
-    bool hasInventorySpace(int maxCargo) const {
-        return inventoryCount < maxCargo;
-    }
+    bool hasInventorySpace(int vehicleMaxCargo) const {
+        return inventoryCount < vehicleMaxCargo;
+    }    
 
     Vehicle* chooseVehicle() const;
-    Item*    chooseItem()   const;
+    Item* chooseItem() const;
 
     void useItem(Item* item, Vehicle& v);
 
     bool isGameOver(int cheapestVehicleCost) const;
+
+    void clearAllVehicles();
+    void clearAllItems();
 
 private:
     int currency;
     int runCount;
 
     Vehicle* ownedVehicles[MAX_VEHICLES];
-    int      ownedVehicleCount;
+    int ownedVehicleCount;
 
-    Item*    inventory[MAX_INVENTORY];
-    int      inventoryCount;
+    Item* inventory[MAX_INVENTORY];
+    int inventoryCount;
 };

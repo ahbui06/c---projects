@@ -1,6 +1,4 @@
-// =============================
-// File: Player.cpp
-// =============================
+
 #include "Player.h"
 #include <iostream>
 #include <limits>
@@ -17,11 +15,19 @@ Player::~Player() {
     for (int i = 0; i < inventoryCount; ++i) delete inventory[i];
 }
 
-int  Player::getCurrency() const   { return currency; }
+int Player::getCurrency() const   { return currency; }
 void Player::addCurrency(int amt)  { currency += amt; }
 
-int  Player::getRunCount() const   { return runCount; }
+int Player::getRunCount() const   { return runCount; }
 void Player::incrementRunCount()   { ++runCount; }
+
+void Player::setCurrency(int c) {
+    currency = c;
+}
+
+void Player::setRunCount(int r) {
+    runCount = r;
+}
 
 int Player::getInventoryCount() const {
     return inventoryCount;
@@ -72,8 +78,20 @@ bool Player::removeOwnedVehicle(Vehicle* v) {
     return false;
 }
 
-bool Player::addItem(Item* i) {
-    if (inventoryCount >= MAX_INVENTORY) return false;
+int Player::getOwnedVehicleCount() const {
+    return ownedVehicleCount;
+}
+
+Vehicle* Player::getOwnedVehicle(int index) const {
+    return ownedVehicles[index];
+}
+
+Item* Player::getInventoryItem(int index) const {
+    return inventory[index];
+  }
+
+bool Player::addItem(Item* i, Vehicle &v) {
+    if (!hasInventorySpace(v.getMaxCargoCapacity())) return false;
     inventory[inventoryCount++] = i;
     return true;
 }
@@ -101,7 +119,7 @@ Vehicle* Player::chooseVehicle() const {
     cout << "Choose vehicle to equip (1-" << ownedVehicleCount << "): ";
     while (!(cin >> choice) || choice < 1 || choice > ownedVehicleCount) {
         cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n'); //basically clears anything that isnt 1-4 in the buffer
+        cin.ignore(numeric_limits<streamsize>::max(), '\n'); //basically clears anything that isnt 1-4 in the buffer.. used pretty much everywhere lol... reason why no endl;
         cout << "Invalid. Enter a number between 1 and " 
              << ownedVehicleCount << ": ";
     }
@@ -132,4 +150,16 @@ void Player::useItem(Item* item, Vehicle& v) {
 
 bool Player::isGameOver(int cheapestVehicleCost) const {
     return currency < cheapestVehicleCost && ownedVehicleCount == 0;
+}
+
+void Player::clearAllVehicles() {
+    while (ownedVehicleCount > 0) {
+        delete ownedVehicles[--ownedVehicleCount];
+    }
+}
+
+void Player::clearAllItems() {
+    while (inventoryCount > 0) {
+        delete inventory[--inventoryCount];
+    }
 }

@@ -2,7 +2,7 @@
 
 using namespace std;
 
-Vehicle::Vehicle(const string &name, int durability, int fuel, int speed, int maxCargoCapacity) : 
+Vehicle::Vehicle(const string &name, int durability, int fuel, int speed, int maxCargo) : 
     name(name),
     durability(durability),
     fuel(fuel),
@@ -10,7 +10,7 @@ Vehicle::Vehicle(const string &name, int durability, int fuel, int speed, int ma
     cargoCapacity(0),
     maxDurability(durability),
     maxFuel(fuel),
-    maxCargoCapacity(cargoCapacity),
+    maxCargoCapacity(maxCargo),
     equippedArmorPatches(0)
 {}
 
@@ -72,6 +72,10 @@ void Vehicle::incrementCargo() {
     if (cargoCapacity < maxCargoCapacity) {
         ++cargoCapacity;
     }
+}
+
+bool Vehicle::canTakeOneMore() const {
+    return cargoCapacity < maxCargoCapacity;
 }
 
 bool Vehicle::equipArmorPatch() {

@@ -1,26 +1,124 @@
-// Main.cpp
+
 #include "Player.h"
 #include "Shop.h"
 #include "Vehicle.h"
+#include "Buggy.h"
+#include "Truck.h"
+#include "Sedan.h"
+#include "SportsCar.h"
+#include "RepairKit.h"
+#include "FuelCanister.h"
+#include "ArmorPatch.h"
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
 #include <limits>
+#include <fstream>
+#include <string>
 
-// forward declaration of the event generator
 void generateRandomEvent(Vehicle &vehicle, Player &player);
 
 using namespace std;
 
+void loadGame(Player &player,
+    const string &filename = "save.txt")
+{
+    ifstream in(filename);
+    if (!in.is_open()) {
+        cout << "Error: could not open `" << filename << "` for reading\n";
+        return;
+    }
+
+    player.clearAllItems();
+    player.clearAllVehicles();
+
+    int currency, runs;
+    in >> currency >> runs;
+    player.setCurrency(currency);
+    player.setRunCount(runs);
+
+    int numV;
+    in >> numV;
+    for (int i = 0; i < numV; ++i) {
+    string name;
+    int dur, fuel;
+    in >> name >> dur >> fuel;
+
+    Vehicle* v = nullptr;
+    if (name == "Buggy")       v = new Buggy();
+    else if (name == "Truck")  v = new Truck();
+    else if (name == "Sedan")  v = new Sedan();
+    else if (name == "SportsCar") v = new SportsCar();
+
+    if (v) {
+        v->setDurability(dur);
+        v->setFuel(fuel);
+        player.addOwnedVehicle(v);
+        }
+    }
+
+    int numI;
+    in >> numI;
+    for (int i = 0; i < numI; ++i) {
+        string iname;
+        in >> iname;
+
+        Item* it = nullptr;
+        if      (iname == "RepairKit")    it = new RepairKit();
+        else if (iname == "FuelCanister") it = new FuelCanister();
+        else if (iname == "ArmorPatch")   it = new ArmorPatch();
+
+        if (it) {
+            Vehicle* v = player.getOwnedVehicle(0);
+            if (player.addItem(it, *v)) {
+                v->incrementCargo();
+            } else {
+                delete it;
+            }
+        }
+    }
+
+    cout << "Game loaded from " << filename
+        << " (Currency: " << player.getCurrency()
+        << ", Runs: "   << player.getRunCount() << ")\n";
+}
+
+void saveGame(const Player &player,
+    const string &filename = "save.txt")
+{
+    ofstream out(filename);
+    if (!out.is_open()) {
+        cout << "Error: could not open `" << filename << "` for writing\n";
+        return;
+    }
+
+    out << player.getCurrency() << ' '
+    << player.getRunCount()  << '\n';
+
+    int vc = player.getOwnedVehicleCount();
+    out << vc << '\n';
+    for (int i = 0; i < vc; ++i) {
+        Vehicle *v = player.getOwnedVehicle(i);
+        out << v->getName()       << ' '
+        << v->getDurability() << ' '
+        << v->getFuel()       << '\n';
+    }
+
+    int ic = player.getInventoryCount();
+    out << ic << '\n';
+    for (int i = 0; i < ic; ++i) {
+        Item *it = player.getInventoryItem(i);
+        out << it->getName() << '\n';
+    }
+}
+
 int main() {
-    // 1) Seed RNG
+
     srand(static_cast<unsigned>(time(nullptr)));
 
-    // 2) Create player and shopp
     Player player;
     Shop   shop;
 
-    // 3) Main menu
     while (true) {
         cout << "=== Welcome to Wasteland Runners! ===\n"
              << "1) Start New Game\n"
@@ -32,10 +130,10 @@ int main() {
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
         if (menuChoice == 1) {
-            break;  // start fresh
+            break;
         }
         else if (menuChoice == 2) {
-            // TODO: implement loadSavedGame(player);
+            loadGame(player);
             cout << "Load saved game (placeholder).\n";
             break;
         }
@@ -48,9 +146,8 @@ int main() {
         }
     }
 
-    // 4) Game loop
     while (true) {
-        // --- Ensure the player has a vehicle ---
+
         Vehicle* current = player.chooseVehicle();
         if (!current) {
             cout << "\nNo vehicles owned. Visit shop:\n";
@@ -64,7 +161,6 @@ int main() {
             continue;
         }
 
-        // --- Before‐run menu ---
         while (true) {
             cout << "\nCurrency: " << player.getCurrency() << "\n";
             cout << "Equipped: " << current->getName()
@@ -80,13 +176,14 @@ int main() {
                  << "3) Start Run\n"
                  << "4) Save Game\n"
                  << "5) Exit Game\n"
+                 << "6) Equip Vehicle\n"
                  << "Enter choice: ";
             int preChoice;
             cin >> preChoice;
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
             if (preChoice == 1) {
-                // Shop flow
+
                 shop.displayVehicles();
                 cout << "Buy vehicle (1-" << SHOP_VEHICLE_COUNT << ") or 0 to skip: ";
                 int vix; 
@@ -102,7 +199,7 @@ int main() {
                 if (iix > 0) shop.purchaseItem(iix, player);
             }
             else if (preChoice == 2) {
-                // Inventory flow
+
                 cout << "\n--- Inventory ---\n";
                 player.printInventoryItems();
                 if (player.getInventoryCount() > 0) {
@@ -117,38 +214,52 @@ int main() {
                 }
             }
             else if (preChoice == 3) {
-                // Start the run
                 break;
             }
             else if (preChoice == 4) {
-                // TODO: implement saveGame(player);
-                cout << "Game saved (placeholder).\n";
+                saveGame(player);
+                cout << "Game saved to save.txt.\n";
             }
             else if (preChoice == 5) {
                 cout << "Exiting game. Goodbye!\n";
                 return 0;
+            }
+            else if (preChoice == 6) {
+                int count = player.getOwnedVehicleCount();
+                if (count == 0) {
+                    cout << "You don’t own any vehicles yet!\n";
+                } else {
+                    cout << "\n--- Equip a Vehicle ---\n";
+                    player.printOwnedVehicles();
+                    cout << "Select (1-" << count << "): ";
+                    int vix;
+                    cin >> vix;
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    if (vix >= 1 && vix <= count) {
+                        current = player.getOwnedVehicle(vix - 1);
+                        cout << current->getName() << " equipped.\n";
+                    } else {
+                        cout << "Invalid selection.\n";
+                    }
+                }
             }
             else {
                 cout << "Invalid choice. Please enter 1–5.\n";
             }
         }
 
-        // --- Record starting stats ---
         int startDurability = current->getDurability();
         int startFuel       = current->getFuel();
 
-        // --- Run random events ---
-        int numEvents = rand() % 5 + 1;  // between 1 and 10
+        int numEvents = rand() % 5 + 1; //max amnt of events is 5
         for (int i = 0; i < numEvents; ++i) {
-            // 1) Fire the event
+
             generateRandomEvent(*current, player);
 
-            // 2) Show stats after the event
             cout << "  [After event " << (i+1) << "] "
                 << "Durability: " << current->getDurability()
                 << ", Fuel: "      << current->getFuel() << "\n";
 
-            // 3) Allow mid‐run item use
             if (player.getInventoryCount() > 0) {
                 cout << "Use an item? (1=yes, 0=no): ";
                 int useIt; 
@@ -158,19 +269,16 @@ int main() {
                     Item* it = player.chooseItem();
                     player.useItem(it, *current);
 
-                    // 4) Show stats again if they used an item
                     cout << "    [After using item] "
                         << "Durability: " << current->getDurability()
                         << ", Fuel: "      << current->getFuel() << "\n";
                 }
             }
 
-    // 5) Stop early if vehicle is gone
     if (current->isDestroyed() || current->isOutOfFuel())
         break;
 }
 
-        // --- Post‐run resolution ---
         int currDur   = current->getDurability();
         int currFuel  = current->getFuel();
         int maxDur    = current->getMaxDurability();
@@ -190,8 +298,7 @@ int main() {
         }
         player.incrementRunCount();
 
-        // --- Game-over check ---
-        const int CHEAPEST = 100;  // match your cheapest vehicle price
+        const int CHEAPEST = 100;
         if (player.isGameOver(CHEAPEST)) {
             cout << "\nGame Over! You survived "
                 << player.getRunCount() << " runs.\n"
@@ -204,12 +311,12 @@ int main() {
 
             if (endChoice == 2) {
                 // Reset the player for a new game
-                player = Player();      // re-initialize currency, runs, inventory, vehicles
+                player = Player();      
                 cout << "\n*** Starting a new game! ***\n\n";
-                continue;               // jump back to the top of the game loop
+                continue;               
             } else {
                 cout << "Thanks for playing!\n";
-                break;                  // exit main game loop and end program
+                break;                  
             }
         }
     }

@@ -18,7 +18,7 @@ enum class EventType {
 
 class Vehicle {
     public:
-        Vehicle(const string &name, int durability, int fuel, int speed, int maxCargoCapacity);
+        Vehicle(const string &name, int durability, int fuel, int speed, int maxCargo);
         virtual ~Vehicle();
 
         const string& getName() const;
@@ -40,6 +40,7 @@ class Vehicle {
         int getMaxFuel() const;
         int getMaxCargoCapacity() const;
         void incrementCargo();
+        bool canTakeOneMore() const;
 
         bool equipArmorPatch();
         bool hasArmorPatchEquipped() const;

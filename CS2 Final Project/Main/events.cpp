@@ -27,15 +27,22 @@ void generateRandomEvent(Vehicle &vehicle, Player &player) {
     int idx = rand() % 8;  
     EventType ev = static_cast<EventType>(idx);
 
-    // Print the event name
     cout << "\n-- Event: " << EVENT_NAMES[idx] << " --\n";
 
     switch (ev) {
         case EventType::AbandonedFuelCache:
             cout << "You found an abandoned fuel cache!\n";
-            if (player.getInventoryCount() < vehicle.getCargoCapacity()) {
-                player.addItem(new FuelCanister());
-                cout << "  (+1 Fuel Canister added to inventory)\n";
+            {
+                FuelCanister* fc = new FuelCanister();
+                if (player.addItem(fc, vehicle)) {
+                    vehicle.incrementCargo();
+                    cout << "  (+1 Fuel Canister). Cargo "
+                         << vehicle.getCargoCapacity() << "/"
+                         << vehicle.getMaxCargoCapacity() << "\n";
+                } else {
+                    delete fc;
+                    cout << "  (No space for Fuel Canister)\n";
+                }
             }
             vehicle.consumeFuel(10);
             break;
@@ -56,11 +63,17 @@ void generateRandomEvent(Vehicle &vehicle, Player &player) {
 
         case EventType::FriendlyTravelers:
             cout << "You meet friendly travelers.\n";
-            if (player.getInventoryCount() < vehicle.getCargoCapacity()) {
-                player.addItem(new RepairKit());
-                cout << "  (+1 RepairKit added to inventory)\n";
-            } else {
-                cout << "  (Your inventory is full - no RepairKit gained)\n";
+            {
+                RepairKit* rk = new RepairKit();
+                if (player.addItem(rk, vehicle)) {
+                    vehicle.incrementCargo();
+                    cout << "  (+1 RepairKit). Cargo "
+                         << vehicle.getCargoCapacity() << "/"
+                         << vehicle.getMaxCargoCapacity() << "\n";
+                } else {
+                    delete rk;
+                    cout << "  (No space for RepairKit)\n";
+                }
             }
             vehicle.consumeFuel(10);
             break;
