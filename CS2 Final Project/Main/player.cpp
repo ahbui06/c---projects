@@ -91,9 +91,6 @@ bool Player::removeItem(Item* i) {
     return false;
 }
 
-bool Player::hasInventorySpace() const {
-    return inventoryCount < MAX_INVENTORY;
-}
 
 Vehicle* Player::chooseVehicle() const {
     printOwnedVehicles();

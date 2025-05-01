@@ -28,38 +28,25 @@ Shop::~Shop() {
 }
 
 void Shop::displayVehicles() const {
-    std::cout << "--- Vehicles for Sale ---\n";
-    for (int i = 0; i < SHOP_VEHICLE_COUNT; ++i) {
-        const auto *v = vehicleCatalog[i];
-        int price = 0;
-        switch (i+1) {
-            case 1: price = 100;  break;  // Buggy
-            case 2: price = 1250; break;  // Truck
-            case 3: price = 500;  break;  // Sedan
-            case 4: price = 1000; break;  // SportsCar
-        }
-        std::cout << (i+1) << ") " << v->getName()
-                  << " -- Price: " << price << "\n";
-    }
+    cout << "\n--- Vehicles for Sale ---\n";
+    cout << "1) Buggy     -- Price: 100\n"
+         << "2) Truck     -- Price: 1250\n"
+         << "3) Sedan     -- Price: 500\n"
+         << "4) SportsCar -- Price: 1000\n";
 }
 
 void Shop::displayItems() const {
-    std::cout << "--- Items for Sale ---\n";
-    for (int i = 0; i < SHOP_ITEM_COUNT; ++i) {
-        const auto *it = itemCatalog[i];
-        int price = 0;
-        switch (i+1) {
-            case 1: price = 250; break; // RepairKit
-            case 2: price = 200; break; // FuelCanister
-            case 3: price = 300; break; // ArmorPatch
-        }
-        std::cout << (i+1) << ") " << it->getName()
-                  << " -- Price: " << price << "\n";
-    }
+    cout << "\n--- Items for Sale ---\n";
+    cout << "1) RepairKit    -- Price: 250\n"
+         << "2) FuelCanister -- Price: 200\n"
+         << "3) ArmorPatch   -- Price: 300\n";
 }
 
 bool Shop::purchaseVehicle(int index, Player &player) {
-    if (index < 1 || index > SHOP_VEHICLE_COUNT) return false;
+    if (index < 1 || index > SHOP_VEHICLE_COUNT) {
+        cout << "Invalid vehicle choice.\n";
+        return false;
+    }
     int price = 0;
     switch (index) {
         case 1: price = 100;  break;  // Buggy
@@ -67,43 +54,61 @@ bool Shop::purchaseVehicle(int index, Player &player) {
         case 3: price = 500;  break;  // Sedan
         case 4: price = 1000; break;  // SportsCar
     }
-    if (player.getCurrency() >= price) {
-        player.addCurrency(-price);
-        Vehicle *v = nullptr;
-        switch (index) {
-            case 1: v = new Buggy();    break;
-            case 2: v = new Truck();    break;
-            case 3: v = new Sedan();    break;
-            case 4: v = new SportsCar(); break;
-        }
-        if (v) {
-            player.addOwnedVehicle(v);
-            return true;
-        }
+    if (player.getCurrency() < price) {
+        cout << "Not enough currency to buy that vehicle.\n";
+        return false;
     }
-    return false;
+    player.addCurrency(-price);
+    Vehicle *v = nullptr;
+    switch (index) {
+      case 1: v = new Buggy();     break;
+      case 2: v = new Truck();     break;
+      case 3: v = new Sedan();     break;
+      case 4: v = new SportsCar(); break;
+    }
+    player.addOwnedVehicle(v);
+    cout << "Purchased " << v->getName() << " for " << price << " currency.\n";
+    return true;
 }
 
 bool Shop::purchaseItem(int index, Player &player) {
-    if (index < 1 || index > SHOP_ITEM_COUNT) return false;
+    if (index < 1 || index > SHOP_ITEM_COUNT) {
+        cout << "Invalid item choice.\n";
+        return false;
+    }
+    Vehicle *current = player.chooseVehicle();
+    if (!current) {
+        cout << "You need a vehicle to carry items!\n";
+        return false;
+    }
+    int cap = current->getMaxCargoCapacity();
+    if (!player.hasInventorySpace(cap)) {
+        cout << "Inventory is full for your "
+             << current->getName() << " (max " << cap << ").\n";
+        return false;
+    }
+
     int price = 0;
+    Item *it   = nullptr;
     switch (index) {
-        case 1: price = 250; break; // RepairKit
-        case 2: price = 200; break; // FuelCanister
-        case 3: price = 300; break; // ArmorPatch
+      case 1: price = 250; it = new RepairKit();    break;
+      case 2: price = 200; it = new FuelCanister(); break;
+      case 3: price = 300; it = new ArmorPatch();   break;
     }
-    if (player.getCurrency() >= price && player.hasInventorySpace()) {
-        player.addCurrency(-price);
-        Item *it = nullptr;
-        switch (index) {
-            case 1: it = new RepairKit();    break;
-            case 2: it = new FuelCanister(); break;
-            case 3: it = new ArmorPatch();   break;
-        }
-        if (it) {
-            player.addItem(it);
-            return true;
-        }
+    if (player.getCurrency() < price) {
+        cout << "Not enough currency to buy that item.\n";
+        delete it;
+        return false;
     }
-    return false;
+
+    player.addCurrency(-price);
+    player.addItem(it);
+    // tell the vehicle you’re now carrying one more
+    current->incrementCargo();
+
+    cout << "Purchased " << it->getName()
+         << " for " << price << " currency. "
+         << "Cargo: " << current->getCargoCapacity()
+         << " / " << cap << "\n";
+    return true;
 }

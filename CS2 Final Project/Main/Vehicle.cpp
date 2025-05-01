@@ -2,12 +2,16 @@
 
 using namespace std;
 
-Vehicle::Vehicle(const string &name, int durability, int fuel, int speed, int cargoCapacity) : 
+Vehicle::Vehicle(const string &name, int durability, int fuel, int speed, int maxCargoCapacity) : 
     name(name),
     durability(durability),
     fuel(fuel),
     speed(speed),
-    cargoCapacity(cargoCapacity)
+    cargoCapacity(0),
+    maxDurability(durability),
+    maxFuel(fuel),
+    maxCargoCapacity(cargoCapacity),
+    equippedArmorPatches(0)
 {}
 
 Vehicle::~Vehicle() { }
@@ -50,6 +54,45 @@ int Vehicle::getCargoCapacity() const {
 
 void Vehicle::setCargoCapacity(int c) {
     cargoCapacity = c;
+}
+
+int Vehicle::getMaxDurability() const {
+    return maxDurability;
+}
+
+int Vehicle::getMaxFuel() const {
+    return maxFuel;
+}
+
+int Vehicle::getMaxCargoCapacity() const {
+    return maxCargoCapacity;
+}
+
+void Vehicle::incrementCargo() {
+    if (cargoCapacity < maxCargoCapacity) {
+        ++cargoCapacity;
+    }
+}
+
+bool Vehicle::equipArmorPatch() {
+    if (equippedArmorPatches < MAX_EQUIPPED_ARMOR) {
+        ++equippedArmorPatches;
+        return true;
+    }
+    return false;
+}
+
+bool Vehicle::hasArmorPatchEquipped() const {
+    return equippedArmorPatches > 0;
+}
+
+void Vehicle::useEquippedArmorPatch() {
+    if (equippedArmorPatches > 0) 
+        --equippedArmorPatches;
+}
+
+int Vehicle::getEquippedArmorPatches() const {
+    return equippedArmorPatches;
 }
 
 void Vehicle::applyDamage(int amount) {

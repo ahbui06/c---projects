@@ -6,5 +6,8 @@ RepairKit::RepairKit()
 { }
 
 void RepairKit::use(Vehicle &v) {
-    v.applyDamage(-25);
+    int newDur = v.getDurability() + 25;
+    if (newDur > v.getMaxDurability())
+        newDur = v.getMaxDurability();
+    v.setDurability(newDur);
 }

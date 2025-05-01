@@ -6,5 +6,8 @@ FuelCanister::FuelCanister()
 { }
 
 void FuelCanister::use(Vehicle &v) {
-    v.consumeFuel(-25);
+    int newFuel = v.getFuel() + 25;
+    if (newFuel > v.getMaxFuel())
+        newFuel = v.getMaxFuel();
+    v.setFuel(newFuel);
 }

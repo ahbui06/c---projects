@@ -7,7 +7,7 @@
 #include "Item.h"
 
 static const int MAX_VEHICLES   = 4;
-static const int MAX_INVENTORY  = 7;
+static const int MAX_INVENTORY  = 5;
 
 class Player {
 public:
@@ -30,7 +30,9 @@ public:
 
     bool addItem(Item* i);
     bool removeItem(Item* i);
-    bool hasInventorySpace() const;
+    bool hasInventorySpace(int maxCargo) const {
+        return inventoryCount < maxCargo;
+    }
 
     Vehicle* chooseVehicle() const;
     Item*    chooseItem()   const;

@@ -1,0 +1,41 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Build WastelandRunners",
+        "type": "shell",
+        "command": "C:\\msys64\\ucrt64\\bin\\g++.exe",
+        "args": [
+          "-g",
+          // All sources live under Main/
+          "${workspaceFolder}/Main/main.cpp",
+          "${workspaceFolder}/Main/Vehicle.cpp",
+          "${workspaceFolder}/Main/Player.cpp",
+          "${workspaceFolder}/Main/Shop.cpp",
+          "${workspaceFolder}/Main/Events.cpp",
+          "${workspaceFolder}/Main/Buggy.cpp",
+          "${workspaceFolder}/Main/Truck.cpp",
+          "${workspaceFolder}/Main/Sedan.cpp",
+          "${workspaceFolder}/Main/SportsCar.cpp",
+          "${workspaceFolder}/Main/Item.cpp",
+          "${workspaceFolder}/Main/RepairKit.cpp",
+          "${workspaceFolder}/Main/FuelCanister.cpp",
+          "${workspaceFolder}/Main/ArmorPatch.cpp",
+          "-o",
+          // Place the exe next to main.cpp
+          "${workspaceFolder}/Main/WastelandRunners.exe"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}"
+        },
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": [
+          "$gcc"
+        ]
+      }
+    ]
+  }
+  
