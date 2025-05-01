@@ -20,7 +20,7 @@ public:
     bool purchaseItem(int index, Player &player);
 
     const Vehicle* getVehicle(int index) const;
-    const Item*    getItem(int index) const;
+    const Item* getItem(int index) const;
 
 private:
     Vehicle* vehicleCatalog[SHOP_VEHICLE_COUNT];

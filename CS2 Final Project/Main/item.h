@@ -5,12 +5,12 @@ class Vehicle;
 
 class Item {
 public:
-    Item(const std::string &name);
+    Item(const string &name);
     virtual ~Item();
 
-    const std::string& getName() const;
+    const string& getName() const;
     virtual void use(Vehicle &v) {};
 
 private:
-    std::string name;
+    string name;
 };
